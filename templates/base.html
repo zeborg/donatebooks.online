@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+    <script src="https://kit.fontawesome.com/2026f8bfa9.js" crossorigin="anonymous"></script>
+    
+    <style>
+      body {
+        background: url("{{ url_for('static', filename='bg.png') }}");
+        background-repeat: repeat;
+      }
+      #map {
+        height: 500px;
+      }
+    </style>
+
+    <title>{{ title }}</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+      <a class="navbar-brand" href="#">donate📚.online</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    
+      <div class="collapse navbar-collapse" id="navbarToggler">
+        <div class="mr-auto"></div>
+        {% if current_user.is_authenticated %}
+          <ul class="navbar-nav ml-auto mt-lg-0">
+            <li class="nav-item nav-link disabled text-light">
+              Logged in as <b class="text-info">{{ current_user.username }}</b>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+            </li>
+            <!-- <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('profile') }}">Help</a>
+            </li> -->
+            <button class="btn btn-outline-light my-2 ml-3 my-sm-0" type="button" onclick="location.href='/logout'">Logout</button>
+          </ul>
+        {% else %}
+          <button class="btn btn-outline-light my-2 mr-3 my-sm-0" type="button" data-toggle="modal" data-target="#loginModal">Login</button>
+          <button class="btn btn-light my-2 my-sm-0" type="button" data-toggle="modal" data-target="#registerModal">Register</button>
+        {% endif %}
+      </div>
+    </nav>
+
+    <div class="container bg-light py-3">
+      <!-- {% with messages = get_flashed_messages() %}
+      {% if messages %}
+          <div class="notification is-danger">
+              {{ messages[0] }}
+          </div>
+      {% endif %}
+      {% endwith %} -->
+      
+      {% block content %}
+      {% endblock %}
+    </div>
+    <footer class="p-1 text-center rounded bg-light w-25 mt-2 ml-auto mr-auto"><code>Made with &hearts; by <a href="https://devpost.com/zeborg" target="_blank">Abhinav</a> & <a href="https://devpost.com/ccimogu" target="_blank">Christine</a></code></footer>
+    {% if not current_user.is_authenticated %}
+      <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="loginModalLabel">Login</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form class="form" method="POST" action="/login">
+                {{ loginform.hidden_tag() }}
+                <div class="form-group row justify-content-center">
+                  <div class="col-3">{{ loginform.user.label }}</div>
+                  <div class="col-6">{{ loginform.user }}</div>
+                </div>
+                <div class="form-group row justify-content-center">
+                  <div class="col-3">{{ loginform.password.label }}</div>
+                  <div class="col-6">{{ loginform.password }}</div>
+                </div>
+                <div class="form-group row justify-content-center">
+                  <div class="col-4 p-0">{{ loginform.remember.label(class="align-middle") }}</div>
+                  <div class="col-1 p-0">{{ loginform.remember }}</div>
+                </div>
+                <div class="row justify-content-center">
+                  <button type="submit" class="btn btn-info">Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="registerModalLabel">Register</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form class="form" method="POST" action="/register">
+                {{ regform.hidden_tag() }}
+                <div class="form-group row justify-content-center">
+                  <div class="col-3">{{ regform.fullname.label }}</div>
+                  <div class="col-6">{{ regform.fullname }}</div>
+                </div>
+                <div class="form-group row justify-content-center">
+                  <div class="col-3">{{ regform.user.label }}</div>
+                  <div class="col-6">{{ regform.user }}</div>
+                </div>
+                <div class="form-group row justify-content-center">
+                  <div class="col-3">{{ regform.email.label }}</div>
+                  <div class="col-6">{{ regform.email }}</div>
+                </div>
+                <div class="form-group row justify-content-center">
+                    <div class="col-3">{{ regform.password.label }}</div>
+                    <div class="col-6">{{ regform.password }}</div>
+                </div>
+                <div class="form-group row justify-content-center">
+                  <div class="col-3">{{ regform.acctype.label }}</div>
+                  <div class="form-inline form-check">
+                  {% for radio in regform.acctype %}
+                    {{ radio(class='form-check-input') }}
+                    {{ radio.label(class='form-check-label mr-2') }}
+                  {% endfor %}
+                  </div>
+                </div>
+                <div class="row justify-content-center">
+                  <button type="submit" class="btn btn-info">Submit</button>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <small id="emailHelp" class="form-text text-muted">We'll never share your details with anyone else.</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    
+    <!-- Required Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
+  </body>
+</html>

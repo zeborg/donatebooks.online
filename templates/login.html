@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-center text-primary h1">Login</h1>
+
+<form class="text-center" method="POST" action="/login">
+    {{ loginform.hidden_tag() }}
+    <div class="form-group">
+        {{ loginform.user.label }}
+        {{ loginform.user }}
+    </div>
+    <div class="form-group">
+        {{ loginform.password.label }}
+        {{ loginform.password }}
+    </div>
+    <div class="form-check">
+        {{ loginform.remember.label }}
+        {{ loginform.remember }}
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+{% endblock %}

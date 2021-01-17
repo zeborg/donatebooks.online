@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-center text-primary h1">Register</h1>
+<form class="text" method="POST" action="/register">
+    {{ regform.hidden_tag() }}
+    <div class="form-group">
+        {{ regform.user.label }}
+        {{ regform.user }}
+    </div>
+    <div class="form-group">
+        {{ regform.email.label }}
+        {{ regform.email }}
+    </div>
+    <div class="form-group">
+        {{ regform.acctype.label }}
+        <div class="form-check form-inline">
+        {% for radio in regform.acctype %}
+            {{ radio(class="mr-1") }}
+            {{ radio.label(class="mr-3") }}
+        {% endfor %}
+        </div>
+    </div>
+    <div class="form-group">
+        {{ regform.password.label }}
+        {{ regform.password }}
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+{% endblock %}

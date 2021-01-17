@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class="flashes">
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %} -->
+<span class="h2 text-secondary">Dashboard</span>
+<hr>
+<div class="row">
+    <div class="col-3">
+        <div class="list-group" id="list-tab" role="tablist">
+        {% if current_user.acctype == 'user' %}
+          <a class="list-group-item list-group-item-action list-group-item-secondary active" id="find-book-list" data-toggle="list" href="#find-book" role="tab" aria-controls="find-book">Find Books</a>
+          <a class="list-group-item list-group-item-action list-group-item-secondary" id="donate-book-list" data-toggle="list" href="#donate-book" role="tab" aria-controls="profile">Donate a Book</a>
+          <a class="list-group-item list-group-item-action list-group-item-secondary" id="my-donations-list" data-toggle="list" href="#my-donations" role="tab" aria-controls="my-donations">My Donations</a>
+        {% else %}
+        <a class="list-group-item list-group-item-action list-group-item-secondary active" id="lib-shelf-list" data-toggle="list" href="#lib-shelf" role="tab" aria-controls="shelf">Bookshelf</a>
+        <a class="list-group-item list-group-item-action list-group-item-secondary" id="lib-addbook-list" data-toggle="list" href="#lib-addbook" role="tab" aria-controls="addbook">Add Book</a>
+        <a class="list-group-item list-group-item-action list-group-item-secondary" id="lib-userdonations-list" data-toggle="list" href="#lib-userdonations" role="tab" aria-controls="userdonations">User Donations</a>
+        {% endif %}
+        <a class="list-group-item list-group-item-action list-group-item-secondary" id="profile-list" data-toggle="list" href="#profile" role="tab" aria-controls="messages">User Pofile</a>
+      </div>
+    </div>
+    <div class="col-9">
+      <div class="tab-content" id="nav-tabContent">
+        {% if current_user.acctype == 'user' %}
+          <div class="tab-pane fade show active" id="find-book" role="tabpanel" aria-labelledby="find-book-list">
+              {% for book in books  %}
+              <div class="card d-inline-flex my-1" style="width: 17rem;">
+                <img src="https://img.icons8.com/emoji/452/green-book.png" class="card-img-top w-50 mr-auto ml-auto" alt="{{ book.bookname }}">
+                <div class="card-body">
+                  <h5 class="card-title">{{ book.bookname }}</h5>
+                  <span class="card-text">
+                    <b>Library</b>: {{ book.library }}
+                  </span>
+                  <span class="card-text d-block">
+                    <b>Donor</b>: {{ book.donor }}
+                  </span>
+                  <span class="card-text d-block">
+                    <b>Author</b>: {{ book.author }}
+                  </span>
+                  <span class="card-text d-block">
+                    <b>Year</b>: {{ book.year }}
+                  </span>
+                  <p class="card-text mt-3">
+                    <b class="text-info">Request donation at:</b> {{ book.libmail }}
+                  </p>
+                </div>
+              </div>
+              {% endfor %}
+          </div>
+          <div class="tab-pane fade" id="donate-book" role="tabpanel" aria-labelledby="donate-book-list">
+            <form class="form" method="POST" action="/donatebook">
+              {{ donateform.hidden_tag() }}
+
+              <div class="form-group row">
+                <div class="col-3">{{ donateform.library.label }}</div>
+                <div class="col-3">{{ donateform.library }}</div>
+              </div>
+              <div class="form-group row">
+                <div class="col-3">{{ donateform.bookname.label }}</div>
+                <div class="col-6">{{ donateform.bookname }}</div>
+              </div>
+              <div class="form-group row">
+                <div class="col-3">{{ donateform.author.label }}</div>
+                <div class="col-6">{{ donateform.author }}</div>
+              </div>
+              <div class="form-group row">
+                <div class="col-3">{{ donateform.publisher.label }}</div>
+                <div class="col-6">{{ donateform.publisher }}</div>
+              </div>
+              <div class="form-group row">
+                <div class="col-3">{{ donateform.year.label }}</div>
+                <div class="col-6">{{ donateform.year }}</div>
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+          </div>
+          <div class="tab-pane fade" id="my-donations" role="tabpanel" aria-labelledby="my-donations">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Req ID</th>
+                  <th scope="col">Book Name</th>
+                  <th scope="col">Author</th>
+                  <th scope="col">Library</th>
+                  <th scope="col">Publisher</th>
+                  <th scope="col">Year</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for donation in donations %}
+                <tr>
+                  <th scope="row">{{ donation.id }}</th>
+                  <td>{{ donation.bookname }}</td>
+                  <td>{{ donation.author }}</td>
+                  <td>{{ donation.library }}</td>
+                  <td>{{ donation.publisher }}</td>
+                  <td>{{ donation.year }}</td>
+                  <td>{{ donation.status }}</td>
+                  <td class="text-center"><a href="#" title="Cancel Donation"><i class="fa fa-times text-danger"></i></a></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="tab-pane fade show active" id="lib-shelf" role="tabpanel" aria-labelledby="lib-shelf-list">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Book Name</th>
+                  <th scope="col">Author</th>
+                  <th scope="col">Donor</th>
+                  <th scope="col">Publisher</th>
+                  <th scope="col">Year</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for book in bookshelf %}
+                <tr>
+                  <th scope="row">{{ book.id }}</th>
+                  <td>{{ book.bookname }}</td>
+                  <td>{{ book.author }}</td>
+                  <td>{{ book.donor }}</td>
+                  <td>{{ book.publisher }}</td>
+                  <td>{{ book.year }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="tab-pane fade" id="lib-addbook" role="tabpanel" aria-labelledby="lib-addbook-list">
+            <form class="form" method="POST" action="/addbook">
+              {{ bookform.hidden_tag() }}
+              <div class="form-group row">
+                <div class="col-3">{{ bookform.bookname.label }}</div>
+                <div class="col-6">{{ bookform.bookname }}</div>
+              </div>
+              <div class="form-group row">
+                <div class="col-3">{{ bookform.author.label }}</div>
+                <div class="col-6">{{ bookform.author }}</div>
+              </div>
+              <div class="form-group row">
+                <div class="col-3">{{ bookform.donor.label }}</div>
+                <div class="col-6">{{ bookform.donor }}</div>
+              </div>
+              <div class="form-group row">
+                <div class="col-3">{{ bookform.publisher.label }}</div>
+                <div class="col-6">{{ bookform.publisher }}</div>
+              </div>
+              <div class="form-group row">
+                <div class="col-3">{{ bookform.year.label }}</div>
+                <div class="col-6">{{ bookform.year }}</div>
+              </div>
+              <button type="submit" class="btn btn-outline-info">Submit</button>
+            </form>
+          </div>
+          <div class="tab-pane fade" id="lib-userdonations" role="tabpanel" aria-labelledby="lib-userdonations-list">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Req ID</th>
+                  <th scope="col">Book Name</th>
+                  <th scope="col">Author</th>
+                  <th scope="col">Donor</th>
+                  <th scope="col">Publisher</th>
+                  <th scope="col">Year</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for donation in donations %}
+                <tr>
+                  <th scope="row">{{ donation.id }}</th>
+                  <td>{{ donation.bookname }}</td>
+                  <td>{{ donation.author }}</td>
+                  <td>{{ donation.donor }}</td>
+                  <td>{{ donation.publisher }}</td>
+                  <td>{{ donation.year }}</td>
+                  <td>{{ donation.status }}</td>
+                  <td><a href="#"><i class="fa fa-check text-success mr-3" title="Received"></i></a><a href="#" title="Cancelled"><i class="fa fa-times text-danger"></i></a></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-list">
+          <ul class="list-group">
+            <li class="list-group-item list-group-item-action list-group-item-light"><b>User ID</b>: {{ current_user.id }}</li>
+            <li class="list-group-item list-group-item-action list-group-item-light"><b>Username</b>: {{ current_user.username }}</li>
+            <li class="list-group-item list-group-item-action list-group-item-light"><b>Full Name</b>: {{ current_user.fullname }}</li>
+            <li class="list-group-item list-group-item-action list-group-item-light"><b>Email</b>: {{ current_user.email }}</li>
+            <li class="list-group-item list-group-item-action list-group-item-light"><b>Account type</b>: {{ current_user.acctype }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
